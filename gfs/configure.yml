@@ -1,0 +1,41 @@
+---
+# These commands only need to run from one of the hosts. Doesn't matter which one
+- hosts: gfs[0]
+  tasks:
+  - name: Create a script to probe your peers
+    template: src=templates/probe.sh.j2 dest=/root/probe.sh owner=root group=root mode=0744
+
+  - name: Probe your peers
+    shell: /root/probe.sh
+
+# Now on all hosts...
+- hosts: gfs
+  tasks:
+  - name: Verify that each host in the cluster sees every other host in the cluster
+    shell: gluster peer status
+
+# Now on one host...
+- hosts: gfs[0]
+  tasks:
+    # Starting the volume creates the /data/brick1/files/.glusterfs directory. Putting the creates: flag here
+    # stops these two steps from executing once the volume has been created.
+  - name: Create a gluster volume
+    shell: gluster volume create volume1 replica 3 gfs1:/data/brick1/files gfs2:/data/brick1/files gfs3:/data/brick1/files gfs1:/data/brick2/files gfs2:/data/brick2/files gfs3:/data/brick2/files gfs1:/data/brick3/files gfs2:/data/brick3/files gfs3:/data/brick3/files
+    args:
+      creates: /data/brick1/files/.glusterfs
+
+  - name: Start the GlusterFS volume
+    shell: gluster volume start volume1
+    args:
+      creates: /data/brick1/files/.glusterfs
+
+  - name: Enable quotas on the volume
+    shell: gluster volume quota volume1 enable && touch /etc/glusterfs/quotas.enabled
+    args:
+      creates: /etc/glusterfs/quotas.enabled
+
+  - name: Enable NFS on volume1
+    shell: gluster volume set volume1 nfs.disable off && touch /etc/glusterfs/nfs.volume1.enabled
+    args:
+      creates: /etc/glusterfs/nfs.volume1.enabled
+

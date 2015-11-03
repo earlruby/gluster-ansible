@@ -1,0 +1,2 @@
+fqdn: gfs3.earlruby.org
+shortname: gfs3

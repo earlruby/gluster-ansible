@@ -1,0 +1,15 @@
+---
+- hosts: linux
+  tasks:
+  - name: Set the host name
+    hostname: name={{ fqdn }}
+
+  - name: Set up /etc/hosts
+    template: src=templates/etc_hosts.j2 dest=/etc/hosts owner=root group=root mode=0644
+
+  - name: Update package cache
+    apt: update_cache=yes
+
+  - name: Update all packages to the latest version
+    apt: upgrade=dist
+

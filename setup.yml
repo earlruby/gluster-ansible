@@ -1,0 +1,3 @@
+---
+- include: base/setup.yml
+- include: gfs/setup.yml

@@ -1,0 +1,5 @@
+[linux]
+gfs[1:3].earlruby.org
+
+[gfs]
+gfs[1:3].earlruby.org

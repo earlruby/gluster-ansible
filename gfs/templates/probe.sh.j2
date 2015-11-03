@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+# Gluster Probe - probe all other hosts from each host, but don't probe yourself
+{% for host in groups['gfs'] %}{% if ( hostvars[host]['fqdn'] != fqdn ) %}
+if [ ! -e /etc/glusterfs/probed.{{ hostvars[host]['fqdn'] }} ]; then
+    gluster peer probe {{ hostvars[host]['fqdn'] }}
+    date > /etc/glusterfs/probed.{{ hostvars[host]['fqdn'] }}
+fi
+{% endif %}{% endfor %}
+

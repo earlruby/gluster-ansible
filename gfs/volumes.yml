@@ -1,0 +1,14 @@
+---
+- hosts: gfs
+  tasks:
+  - name: Install FS packages
+    apt: name={{ item }} state=latest update_cache=yes
+    with_items:
+    - xfsprogs
+
+  - name: Create a script to format and mount drives
+    template: src=templates/format-and-mount.sh.j2 dest=/root/format-and-mount.sh owner=root group=root mode=0744
+
+  - name: Format and mount drives
+    command: /root/format-and-mount.sh
+    

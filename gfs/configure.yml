@@ -1,6 +1,7 @@
 ---
-# These commands only need to run from one of the hosts. Doesn't matter which one
+# These commands only need to run from one of the hosts. Doesn't matter which one.
 - hosts: gfs[0]
+  become: true
   tasks:
   - name: Create a script to probe your peers
     template: src=templates/probe.sh.j2 dest=/root/probe.sh owner=root group=root mode=0744
@@ -10,19 +11,31 @@
 
 # Now on all hosts...
 - hosts: gfs
+  become: true
   tasks:
   - name: Verify that each host in the cluster sees every other host in the cluster
     shell: gluster peer status
 
 # Now on one host...
 - hosts: gfs[0]
+  become: true
   tasks:
-    # Starting the volume creates the /data/brick1/files/.glusterfs directory. Putting the creates: flag here
-    # stops these two steps from executing once the volume has been created.
+  - name: Create a script to create a volume
+    template: src=create-volume.sh.j2 dest=/root/create-volume.sh owner=root group=root mode=0744
+
   - name: Create a gluster volume
-    shell: gluster volume create volume1 replica 3 gfs1:/data/brick1/files gfs2:/data/brick1/files gfs3:/data/brick1/files gfs1:/data/brick2/files gfs2:/data/brick2/files gfs3:/data/brick2/files gfs1:/data/brick3/files gfs2:/data/brick3/files gfs3:/data/brick3/files
+    shell: /root/create-volume.sh
     args:
-      creates: /data/brick1/files/.glusterfs
+      creates: /etc/glusterfs/volume1.created
+
+  - name: Enable NFS on volume1
+    shell: gluster volume set volume1 nfs.disable off
+
+  - name: Disable NFS name lookups
+    shell: gluster volume set volume1 nfs.addr-namelookup off
+
+  - name: Allow volumes to be exported
+    shell: gluster volume set volume1 nfs.export-volumes on
 
   - name: Start the GlusterFS volume
     shell: gluster volume start volume1
@@ -30,12 +43,6 @@
       creates: /data/brick1/files/.glusterfs
 
   - name: Enable quotas on the volume
-    shell: gluster volume quota volume1 enable && touch /etc/glusterfs/quotas.enabled
+    shell: gluster volume quota volume1 enable && touch /etc/glusterfs/volume1.quotas.enabled
     args:
-      creates: /etc/glusterfs/quotas.enabled
-
-  - name: Enable NFS on volume1
-    shell: gluster volume set volume1 nfs.disable off && touch /etc/glusterfs/nfs.volume1.enabled
-    args:
-      creates: /etc/glusterfs/nfs.volume1.enabled
-
+      creates: /etc/glusterfs/volume1.quotas.enabled

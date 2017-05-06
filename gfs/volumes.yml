@@ -1,5 +1,6 @@
 ---
 - hosts: gfs
+  become: true
   tasks:
   - name: Install FS packages
     apt: name={{ item }} state=latest update_cache=yes

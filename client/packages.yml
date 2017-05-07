@@ -1,0 +1,11 @@
+---
+- hosts: client
+  become: true
+  tasks:
+  - name: Install GlusterFS 3.8 repository
+    apt_repository: repo=ppa:gluster/glusterfs-3.8 state=present
+
+  - name: Install Gluster client packages
+    apt: name={{ item }} state=latest update_cache=yes
+    with_items:
+    - glusterfs-client

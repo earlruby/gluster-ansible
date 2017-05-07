@@ -1,0 +1,22 @@
+---
+- hosts: ganesha
+  become: true
+  handlers:
+  - include: handlers/main.yml
+  tasks:
+  - name: Create a mount point for Ganesha
+    file: path=/mnt/ganesha state=directory mode=0755 owner=root group=root
+
+  - name: Create a lock directory for Ganesha
+    file: path=/var/lock/subsys state=directory mode=0755 owner=root group=root
+
+  - name: Set up configuration for Ganesha
+    template: src=etc-ganesha-ganesha.conf.j2 dest=/etc/ganesha/ganesha.conf owner=root group=root mode=0744
+    notify:
+    - Restart Ganesha
+
+  - name: Start Ganesha
+    service: name=nfs-ganesha state=started enabled=yes
+
+  - name: Mount Gluster file system via Ganesha NFS
+    mount: path=/mnt/ganesha src={{ hostvars['client1']['ipv4'] }}:/volume1 fstype=nfs opts="proto=tcp,vers=4.1" state=mounted

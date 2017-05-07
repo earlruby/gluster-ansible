@@ -1,23 +1,29 @@
 ---
+- hosts: gluster
+  become: true
+  tasks:
+  - name: Start the Gluster service on all hosts
+    service: name=glusterfs-server state=started enabled=yes
+
 # These commands only need to run from one of the hosts. Doesn't matter which one.
-- hosts: gfs[0]
+- hosts: gluster[0]
   become: true
   tasks:
   - name: Create a script to probe your peers
-    template: src=templates/probe.sh.j2 dest=/root/probe.sh owner=root group=root mode=0744
+    template: src=probe.sh.j2 dest=/root/probe.sh owner=root group=root mode=0744
 
   - name: Probe your peers
     shell: /root/probe.sh
 
 # Now on all hosts...
-- hosts: gfs
+- hosts: gluster
   become: true
   tasks:
   - name: Verify that each host in the cluster sees every other host in the cluster
     shell: gluster peer status
 
 # Now on one host...
-- hosts: gfs[0]
+- hosts: gluster[0]
   become: true
   tasks:
   - name: Create a script to create a volume
@@ -28,21 +34,10 @@
     args:
       creates: /etc/glusterfs/volume1.created
 
-  - name: Enable NFS on volume1
-    shell: gluster volume set volume1 nfs.disable off
-
-  - name: Disable NFS name lookups
-    shell: gluster volume set volume1 nfs.addr-namelookup off
-
-  - name: Allow volumes to be exported
-    shell: gluster volume set volume1 nfs.export-volumes on
+  - name: Disable Gluster-native NFS on volume1 (We will use Ganesha for NFS access)
+    shell: gluster volume set volume1 nfs.disable on
 
   - name: Start the GlusterFS volume
     shell: gluster volume start volume1
     args:
       creates: /data/brick1/files/.glusterfs
-
-  - name: Enable quotas on the volume
-    shell: gluster volume quota volume1 enable && touch /etc/glusterfs/volume1.quotas.enabled
-    args:
-      creates: /etc/glusterfs/volume1.quotas.enabled

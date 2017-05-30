@@ -1,5 +1,5 @@
 ---
-- hosts: gfs
+- hosts: gluster
   become: true
   tasks:
   - name: Install FS packages
@@ -8,8 +8,8 @@
     - xfsprogs
 
   - name: Create a script to format and mount drives
-    template: src=templates/format-and-mount.sh.j2 dest=/root/format-and-mount.sh owner=root group=root mode=0744
+    template: src=format-and-mount.sh.j2 dest=/root/format-and-mount.sh owner=root group=root mode=0744
 
-  - name: Format and mount drives
+  - name: Format and mount drives (if necessary)
     command: /root/format-and-mount.sh
     

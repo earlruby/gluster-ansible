@@ -2,7 +2,7 @@
 
 # Gluster Volume Create
 gluster volume create volume1 replica 3 \
-{% for host in groups['gfs'] %}
+{% for host in groups['gluster'] %}
     {{ hostvars[host]['fqdn'] }}:/data/brick1/files \
 {% endfor %}
     && touch /etc/glusterfs/volume1.created

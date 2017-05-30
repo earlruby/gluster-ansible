@@ -1,17 +1,14 @@
 ---
-- hosts: gfs
+- hosts: gluster
   become: true
   tasks:
   - name: Install GlusterFS 3.8 repository
     apt_repository: repo=ppa:gluster/glusterfs-3.8 state=present 
 
   - name: Install libntirpc repository
-    apt_repository: repo=ppa:gluster/libntirpc
+    apt_repository: repo=ppa:gluster/libntirpc state=present
   
   - name: Install GlusterFS packages
     apt: name={{ item }} state=latest update_cache=yes
     with_items:
     - glusterfs-server
-  
-  - name: Start Gluster Server
-    service: name=glusterfs-server state=started enabled=yes

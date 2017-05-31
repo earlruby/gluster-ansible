@@ -19,4 +19,4 @@
     service: name=nfs-ganesha state=started enabled=yes
 
   - name: Mount Gluster file system via Ganesha NFS
-    mount: path=/mnt/ganesha src={{ hostvars['client1']['ipv4'] }}:/volume1 fstype=nfs opts="proto=tcp,vers=4.1" state=mounted
+    mount: name=/mnt/ganesha src={{ hostvars['client1']['ipv4'] }}:/volume1 fstype=nfs opts="proto=tcp,vers=4.1" state=mounted

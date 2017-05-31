@@ -6,4 +6,4 @@
     file: path=/mnt/gluster state=directory mode=0755 owner=root group=root
 
   - name: Mount glusterfs
-    mount: path=/mnt/gluster src={{ hostvars['gluster1']['ipv4'] }}:/volume1 fstype=glusterfs state=mounted
+    mount: name=/mnt/gluster src={{ hostvars['gluster1']['ipv4'] }}:/volume1 fstype=glusterfs state=mounted

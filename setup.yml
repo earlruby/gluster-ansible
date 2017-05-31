@@ -1,4 +1,13 @@
 ---
+
+- hosts: all
+  become: true
+  gather_facts: False
+  
+  tasks:
+  - name: Make sure that Python 2 is installed so Ansible will work
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
 - include: base/setup.yml
 - include: gluster/setup.yml
 - include: client/setup.yml

@@ -25,9 +25,9 @@ You'll also need about 2GB RAM free on your host.
 
 ### Tools
 
-* Vagrant 1.9.4
+* Vagrant 1.9.4, 1.9.5 (Vagrantfile does not work on 1.9.1)
 * Virtualbox 5.1.20
-* Ansible 2.3.0.0
+* Ansible 2.2.1.0, 2.3.0.0
 
 ### Operating Systems
 

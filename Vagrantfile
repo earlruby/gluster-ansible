@@ -56,23 +56,23 @@ Vagrant.configure(2) do |config|
         vb.gui = false
 
         # Get disk path
-        disk_file = File.join(Dir.pwd, '.vagrant', 'machines', vb.name, 'virtualbox', 'disk2.vdi')
+        disk_file = File.join(Dir.pwd, '.vagrant', 'machines', vb.name, 'virtualbox', 'brick1.vmdk')
 
         unless hostname == "client1"
           # Create an extra block device for Gluster nodes.
           unless File.exist?(disk_file)
-            vb.customize ['createhd', '--filename', disk_file, '--size', 1 * 1024]
+            vb.customize ['createmedium', 'disk', '--format', 'vmdk', '--filename', disk_file, '--size', 1 * 1024, '--variant', 'standard']
           end
           # Use 'VBoxManage showvminfo $vmname' to find out what storage controllers are supported
           if vm_os == "ubuntu/trusty64"
             vb.customize ['storageattach', :id, '--storagectl', 'SATAController', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk_file]
-          #else
-           # vb.customize ['storageattach', :id, '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk_file]
+          else
+            vb.customize ['storageattach', :id, '--storagectl', 'SCSI', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk_file]
           end
         end
       end
 
-      # Wait until all nodes are provisioned before running Ansible.
+      # Wait until all nodes are provisioned before running Ansible.q
       if index == cluster.size - 1
         # Configure Gluster using Ansible
         config.vm.provision "ansible" do |ansible|

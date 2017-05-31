@@ -2,8 +2,8 @@
 - hosts: gluster
   become: true
   tasks:
-  - name: Install GlusterFS 3.8 repository
-    apt_repository: repo=ppa:gluster/glusterfs-3.8 state=present 
+  - name: Install GlusterFS repository
+    apt_repository: repo=ppa:gluster/{{ gluster_repo }} state=present 
 
   - name: Install libntirpc repository
     apt_repository: repo=ppa:gluster/libntirpc state=present

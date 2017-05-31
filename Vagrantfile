@@ -3,6 +3,11 @@
 
 ENV["LC_ALL"] = "en_US.UTF-8"
 
+# Valid values are:
+#  * ubuntu/trusty64
+#  * ubuntu/xenial64
+vm_os = "ubuntu/xenial64"
+
 cluster = {
   "client1" => {
       "fqdn" => "client1.lab",
@@ -22,16 +27,19 @@ cluster = {
   }
 }
 
+# Valid gluster_repo values are "glusterfs-3.8", "glusterfs-3.9", and "glusterfs-3.10"
 groups = {
   "linux"   => ["client1", "gluster1", "gluster2", "gluster3"],
   "gluster" => ["gluster1", "gluster2", "gluster3"],
   "client"  => ["client1"],
-  "ganesha" => ["client1"]
+  "linux:vars" => {
+    "gluster_repo" => "glusterfs-3.10"
+  }
 }
 
 Vagrant.configure(2) do |config|
 
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = vm_os
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # Set up the nodes
@@ -46,7 +54,7 @@ Vagrant.configure(2) do |config|
 
         # Don't display the VirtualBox GUI when booting the machine
         vb.gui = false
-        
+
         # Get disk path
         disk_file = File.join(Dir.pwd, '.vagrant', 'machines', vb.name, 'virtualbox', 'disk2.vdi')
 
@@ -55,7 +63,12 @@ Vagrant.configure(2) do |config|
           unless File.exist?(disk_file)
             vb.customize ['createhd', '--filename', disk_file, '--size', 1 * 1024]
           end
-          vb.customize ['storageattach', :id, '--storagectl', 'SATAController', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk_file]
+          # Use 'VBoxManage showvminfo $vmname' to find out what storage controllers are supported
+          if vm_os == "ubuntu/trusty64"
+            vb.customize ['storageattach', :id, '--storagectl', 'SATAController', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk_file]
+          #else
+           # vb.customize ['storageattach', :id, '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk_file]
+          end
         end
       end
 

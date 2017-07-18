@@ -1,2 +1,0 @@
-fqdn: gfs2.earlruby.org
-shortname: gfs2

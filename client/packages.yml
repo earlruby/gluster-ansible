@@ -1,0 +1,8 @@
+---
+- hosts: client
+  become: true
+  tasks:
+  - name: Install Gluster client packages
+    apt: name={{ item }} state=latest update_cache=yes
+    with_items:
+    - glusterfs-client

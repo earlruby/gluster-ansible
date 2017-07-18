@@ -1,0 +1,8 @@
+---
+- hosts: gluster
+  become: true
+  tasks:
+  - name: Install GlusterFS packages
+    apt: name={{ item }} state=latest update_cache=yes
+    with_items:
+    - glusterfs-server

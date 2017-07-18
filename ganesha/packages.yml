@@ -1,0 +1,11 @@
+---
+- hosts: ganesha
+  become: true
+  tasks:
+  - name: Install Ganesha NFS packages
+    apt: name={{ item }} state=latest update_cache=yes
+    with_items:
+    - nfs-ganesha
+    - nfs-ganesha-fsal
+    - glusterfs-common
+    - glusterfs-client

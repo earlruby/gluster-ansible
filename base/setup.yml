@@ -8,6 +8,15 @@
   - name: Set up /etc/hosts
     template: src=templates/etc_hosts.j2 dest=/etc/hosts owner=root group=root mode=0644
 
+  - name: Install GlusterFS 3.10 repository
+    apt_repository: repo=ppa:gluster/glusterfs-3.10 state=present
+
+  - name: Install Ganesha repository
+    apt_repository: repo=ppa:gluster/nfs-ganesha state=present
+
+  - name: Install libntirpc repository
+    apt_repository: repo=ppa:gluster/libntirpc state=present
+
   - name: Update package cache
     apt: update_cache=yes
 

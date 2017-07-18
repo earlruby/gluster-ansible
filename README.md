@@ -38,6 +38,7 @@ You'll also need about 2GB RAM free on your host.
 
 * Gluster 3.8.11 (on Ubuntu Trusty)
 * Gluster 3.8.12 (on Ubuntu Trusty)
+* Gluster 3.10.4 (on Ubuntu Trusty)
 * Gluster 3.10.2 (on Ubuntu Xenial)
 * libntirpc 1.4.3
 * Ganesha 2.4.5
